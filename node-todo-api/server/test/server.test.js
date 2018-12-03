@@ -10,7 +10,9 @@ const todos = [{
 	text: 'First todo test'
 }, {
 	_id: new ObjectID(),
-	text: 'Second test todo'
+	text: 'Second test todo',
+	completed: false,
+	completedAt: 300
 }];
 
 beforeEach((done) => {
@@ -132,7 +134,7 @@ describe('DELETE /todos/:id', () => {
 			});
 	});
 
-	it('should return a 404 if todo not found', () => {
+	it('should return a 404 if todo not found', (done) => {
 		var hexId = todos[1]._id.toHexString();
 
 		supertest(app)
@@ -141,10 +143,54 @@ describe('DELETE /todos/:id', () => {
 			.end(done);
 	});
 
-	it('should return a 404 if object id is invalid', () => {
+	it('should return a 404 if object id is invalid', (done) => {
+		var hexId = todos[1]._id.toHexString();
+
 		supertest(app)
 			.delete(`/todos/${hexId}`)
 			.expect(404)
+			.end(done);
+	});
+});
+
+describe('PATCH /todos/:id', () => {
+	it('should update the todo', (done) => {
+		var id = todos[0]._id.toHexString();
+
+		var newData = {
+			text: "Replacement Text",
+			completed: true
+		};
+
+		supertest(app)
+			.patch(`/todos/${id}`)
+			.send(newData)
+			.expect(200)
+			.expect((response) => {
+				expect(response.body.todo.text).toBe(newData.text);
+				expect(response.body.todo.completedAt).toBeA('number');
+				expect(response.body.todo.completed).toBe(true);
+			})
+			.end(done);
+	});
+
+	it('should clear completedAt when todo is not completed', (done) => {
+		var id = todos[1]._id.toHexString();
+
+		var newData = {
+			text: "Replacement Text",
+			completed: false
+		};
+
+		supertest(app)
+			.patch(`/todos/${id}`)
+			.send(newData)
+			.expect(200)
+			.expect((response) => {
+				expect(response.body.todo.text).toBe(newData.text);
+				expect(response.body.todo.completedAt).toNotExist();
+				expect(response.body.todo.completed).toBe(false);
+			})
 			.end(done);
 	});
 });

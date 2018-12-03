@@ -39,5 +39,4 @@ User.findById('5c022ab92e338e7f872d4213').then((user) => {
 	console.log(JSON.stringify(user, undefined, 2));
 }, (error) => {
 	console.log(error);
-})
-//if searching by an ID that doesn't exist, it will still 'succees', but will return nothing, so the promise resolved case will still run. Instead, we need to handle this properly
+});
