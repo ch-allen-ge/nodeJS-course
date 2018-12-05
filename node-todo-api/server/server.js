@@ -64,7 +64,7 @@ app.delete('/todos/:id', (request, response) => {
 	Todo.findByIdAndRemove(id)
 		.then((todo) => {
 			if (!todo) {
-				return response.send(404).send();
+				return response.status(404).send();
 			}
 
 			response.send({todo});
@@ -123,15 +123,6 @@ app.post('/users', (request, response) => {
 
 app.get('/users/me', authenticate, (request, response) => {
 	response.status(200).send(request.user);
-});
-
-var scream = (request, response, next) => {
-	console.log('SCREAM');
-	next();
-};
-
-app.get('/scream', scream, (request, response) => {
-	response.send('Here we go');
 });
 
 app.listen(process.env.PORT, () => {
