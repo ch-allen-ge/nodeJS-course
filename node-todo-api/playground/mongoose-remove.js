@@ -8,7 +8,7 @@ Todo.remove({}).then((result) => {
 	console.log(result);
 });
 
-//Todo.findOneAndRemove()
+//Todo.findOneAndRemove({})
 
 Todo.findByIdAndRemove('5c0210ac9e9b701f00e891b0').then((todo) => {
 	console.log(todo);

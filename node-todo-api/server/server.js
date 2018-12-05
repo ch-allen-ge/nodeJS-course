@@ -1,23 +1,14 @@
-var env = process.env.NODE_ENV || 'development';
-
-console.log('env ******', env);
-
-if (env === 'development') {
-	process.env.PORT = 3000;
-	process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoApp';
-} else if (env === 'test') {
-	process.env.PORT === 3000;
-	process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
-}
+require('./config/config.js');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash')
 
-var {mongoose} = require('./db/mongoose.js');
-var {Todo} = require('./models/todo.js');
-var {User} = require('./models/user.js');
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate')
 
 var app = express();
 
@@ -111,6 +102,36 @@ app.patch('/todos/:id', (request, response) => {
 	}).catch((error) => {
 		response.status(400).send();
 	})
+});
+
+app.post('/users', (request, response) => {
+	var details = _.pick(request.body, ['email', 'password']);
+
+	var user = new User(details);
+
+	user.save().then(() => {
+		return user.generateAuthToken();
+	})
+	.then((token) => {
+		console.log('TOKEN', token);
+		response.header('x-auth', token).send(user);
+	})
+	.catch((error) => {
+		response.status(400).send(error);
+	});
+});
+
+app.get('/users/me', authenticate, (request, response) => {
+	response.status(200).send(request.user);
+});
+
+var scream = (request, response, next) => {
+	console.log('SCREAM');
+	next();
+};
+
+app.get('/scream', scream, (request, response) => {
+	response.send('Here we go');
 });
 
 app.listen(process.env.PORT, () => {
