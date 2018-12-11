@@ -14,7 +14,7 @@ var hashedPassword = '$2a$10$rW/9tUNRWIZAGQP2Ztxpye7mbdL96qwvM7uaOya6hOHBSDUfFx5
 
 bcrypt.compare(password, hashedPassword, (error, result) => {
 	console.log(res);
-})
+});
 // var message = 'I am user number 3';
 // var hash = SHA256(message).toString();
 

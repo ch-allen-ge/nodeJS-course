@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash')
+const bcrypt = require('bcryptjs');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -123,6 +124,25 @@ app.post('/users', (request, response) => {
 
 app.get('/users/me', authenticate, (request, response) => {
 	response.status(200).send(request.user);
+});
+
+app.post('/users/login', (request, response) => {
+	var body = _.pick(request.body, ['email', 'password']);
+
+	User.findByCredentials(body.email, body.password).then((user) => {
+		return user.generateAuthToken()
+				.then((token) => {
+					response.header('x-auth', token).send(user);
+				});
+	})
+	.catch((error) => {
+		response.status(400).send();
+	})
+
+	//rehash password above
+	//get hashed password from database
+	//compare hashes
+	//if success, return jwt
 });
 
 app.listen(process.env.PORT, () => {
