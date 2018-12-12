@@ -114,7 +114,6 @@ app.post('/users', (request, response) => {
 		return user.generateAuthToken();
 	})
 	.then((token) => {
-		console.log('TOKEN', token);
 		response.header('x-auth', token).send(user);
 	})
 	.catch((error) => {
@@ -138,12 +137,16 @@ app.post('/users/login', (request, response) => {
 	.catch((error) => {
 		response.status(400).send();
 	})
-
-	//rehash password above
-	//get hashed password from database
-	//compare hashes
-	//if success, return jwt
 });
+
+app.delete('/users/me/token', authenticate, (request, response) => {
+	request.user.removeToken(request.token)
+		.then(() => {
+			response.status(200).send();
+		}, () => {
+			response.status(400).send();
+		});
+})
 
 app.listen(process.env.PORT, () => {
 	console.log(`Started server on port ${process.env.PORT}`);
