@@ -158,7 +158,7 @@ app.delete('/users/me/token', authenticate, (request, response) => {
 		}, () => {
 			response.status(400).send();
 		});
-})
+});
 
 app.listen(process.env.PORT, () => {
 	console.log(`Started server on port ${process.env.PORT}`);
